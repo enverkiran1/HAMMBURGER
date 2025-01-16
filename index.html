@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bölüm Menü</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+
+    <style>
+        /* Genel Sayfa Stilleri */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Üst Menü Barı (Firma Bilgileri) */
+        .navbar {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #333;
+            font-size: x-large;
+            color: white;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: top 0.3s ease;
+        }
+
+        .navbar .firma {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .firma img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            color: white;
+        }
+
+        /* Yeni Kırmızı Bar */
+        .red-bar {
+            background-color: #c0392b;
+            height: 400px;
+            position: fixed;
+            top: 60px;
+            width: 100%;
+            z-index: -10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: top 0.3s ease;
+        }
+
+        .red-bar img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* Alt Menü Barı (Bölümler için) */
+        .sub-navbar {
+            background-color: #444;
+            color: white;
+            padding: 30px;
+            position: fixed;
+            top: 0px;
+            width: 100%;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+            transition: top 0.3s ease;
+        }
+
+        .sub-navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+        }
+
+        .sub-navbar ul li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .sub-navbar ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+        }
+
+        .sub-navbar ul li a:hover {
+            background-color: #575757;
+            border-radius: 4px;
+        }
+
+        /* İçerik Bölümü */
+        .content {
+            margin-top: 350px;
+            padding: 25px;
+        }
+
+        /* Menü Bölümleri */
+        .menu-section {
+            scroll-margin-top: 170px;
+            margin-bottom: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            font-size: 12px;
+ 
+        }
+
+        .menu-section h2 {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            color: brow; /* Ürün isimlerini kahverengi yaptık */
+
+        }
+
+        /* Ürün Kartları */
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .product-card {
+            flex: 0 0 calc(50% - 10px);
+            max-width: calc(50% - 10px);
+            box-sizing: border-box;
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+ 
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .product-card h2 {
+            font-family: "Bangers", serif;
+            font-weight: 400;
+            font-size: 25px;
+            margin: 10px 0;
+            color: burlywood; /* Ürün isimlerini kahverengi yaptık */
+
+        }
+     /* Modal Stili */
+     .modal {
+        display: none;
+        position: fixed;
+        z-index: 200;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+
+        /* Tam ortalamak için flexbox */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 10px; /* Kenarları yuvarlatılmış modal */
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: red;
+        text-decoration: none;
+        cursor: pointer;
+    }
+        .close:hover,
+        .close:focus {
+            color: red;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Mobil Ekranlar (480px ve altı) */
+        @media (max-width: 480px) {
+            .product-card {
+                flex: 0 0 calc(50% - 5px);
+                max-width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Üst Bar (Firma Bilgileri) -->
+    <div class="navbar">
+        <div class="firma">
+            <img src="hamm.png" alt="Firma Logosu">
+            <h2>Hammburger</h2>
+        </div>
+    </div>
+
+    <!-- Yeni Kırmızı Bar -->
+    <div class="red-bar">
+        <img src="hamm.png" alt="Kare Resim">
+    </div>
+
+    <!-- Alt Bar (Bölümler İçin) -->
+    <div class="sub-navbar">
+        <ul>
+            <li><a href="#bolum1">Burger Menüler</a></li>
+            <li><a href="#bolum2">Burgerler</a></li>
+            <li><a href="#bolum3">Menüler</a></li>
+            <li><a href="#bolum4">Sandviçler</a></li>
+            <li><a href="#bolum5">Tostlar</a></li>
+            <li><a href="#bolum6">Salatalar</a></li>
+            <li><a href="#bolum7">Yan Ürünler</a></li>
+            <li><a href="#bolum8">Ekstra Malzemeler ve Soslar</a></li>
+            <li><a href="#bolum9">İçecekler</a></li>
+         </ul>
+    </div>
+
+    <!-- İçerik Bölümü -->
+    <div class="content">
+        <section id="bolum1" class="menu-section">
+            <h2>Burger Menüler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Arkadaş Menü">
+                    <img src="menu1.png" alt="Ürün 1">
+
+                    <p class="price">₺100</p>
+                 </div>
+                <div class="product-card" data-product-name="Arkadaş Chicken Menü">
+                    <img src="menu2.png" alt="Ürün 2">
+                    <p class="price">₺150</p>
+                </div>
+                <div class="product-card" data-product-name="Ofis Menü">
+                    <img src="menu3.png" alt="Ürün 3">
+                    <p class="price">₺200</p>
+                </div>
+                <div class="product-card" data-product-name="Aile Menü">
+                    <img src="menu4.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Aile Chicken Menü">
+                    <img src="menu5.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+            </div>
+        </section>
+    </div>
+     <!-- Bölüm 2 -->
+        <section id="bolum2" class="menu-section">
+            <h2>Burgerler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Hamm burger">
+                    <img src="hammB1.png" alt="Ürün 1">
+                    <p class="price">₺100</p>
+                </div>
+                <div class="product-card" data-product-name="Fume burger">
+                    <img src="fümeB.png" alt="Ürün 2">
+                    <p class="price">₺150</p>
+                </div>
+                <div class="product-card" data-product-name="Mantar Burger">
+                    <img src="mantar.png" alt="Ürün 3">
+                    <p class="price">₺200</p>
+                </div>
+                <div class="product-card" data-product-name="Begendili Burger">
+                    <img src="begendiliburger.png">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Pastirmali Burger">
+                    <img src="pastirmaliburger.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Yangin Burger">
+                    <img src="yangınB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Soslu Burger">
+                    <img src="sosluB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Turk Usulu Burger">
+                    <img src="yumurtaB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Yeşillik Burger">
+                    <img src="yeşillik.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Tavuk Burger">
+                    <img src="tavukB1.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Mantar Tavuk Burger">
+                    <img src="tavukB3.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Hamm Special">
+                    <img src="specialB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Osmanli Burger">
+                    <img src="sucukB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Lokum Burger">
+                    <img src="lokumB.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Begendili Lokum Burger">
+                    <img src="begendililokumburger.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Mantar Lokum Burger">
+                    <img src="mantarlokumburger.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Cocuk Et Burger">
+                    <img src="cocuketburger.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+                <div class="product-card" data-product-name="Cocuk Tavuk Burger">
+                    <img src="cocuktavukburger.png" alt="Ürün 3">
+                    <p class="price">₺250</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm3-->
+        <section id="bolum3" class="menu-section">
+            <h2>Menüler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="İzgara Kofte Menu">
+                    <img src="izgaraM.png" alt="İçecek 1">
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Sandvic Kofte Menu">
+                   
+                    <h2 class="product-name">Sandviç Köfte Menü</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Ayvalik Menu">
+                    
+                    <h2 class="product-name">Ayvalık Menü</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Kumru Menu">
+                    
+                    <h2 class="product-name">Kumru Menü</h2>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm4-->
+        <section id="bolum4" class="menu-section">
+            <h2>Sandvicler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Ton Balikli Sandvic">
+                   
+                    <h2 class="product-name">Ton Balıklı Sandviç</h2>
+                    <p>Ton balık,domates,kıvırcık</p>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Beyaz Peynirli Sandvic">
+                    
+                    <h2 class="product-name">Beyaz Peynirli Sandviç</h2>
+                    <p>Beyaz peynir,domates,kıvırcık</p>
+                    <p class="price">₺10</p>
+                </div>
+   
+                <div class="product-card" data-product-name="Kasarli Sandvic">
+                    
+                    <h2 class="product-name">Kasarli Sandvic</h2>
+                    <p>Kaşar peynir,domates,kıvırcık</p>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm5-->
+        <section id="bolum5" class="menu-section">
+            <h2>Tostlar</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Yengen Tost">
+                    
+                    <h2 class="product-name">Yengen Tost</h2>
+                    <p>Ayvalık ekmeği,sucuk,kaşar peyniri,domates,turşu,hamm sos.</p>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Kavurmali Kasarli Tost">
+                   
+                    <h2 class="product-name">Kavurmalı Kaşarlı Tost</h2>
+                    <p>Ayvalık ekmeği,kavurma,kaşar peyniri.</p>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Ayvalik Tost">
+                    
+                    <h2 class="product-name">Ayvalik Tost</h2>
+                    <p>Ayvalık ekmeği,sosis,sucuk,kaşar peyniri,turşu,domates,amerikan salatası,hamm sos.</p>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Karisik Tost">
+                   
+                    <h2 class="product-name">Karışık Tost</h2>
+                    <p>Ayvalık ekmeği,sucuk,kaşar peyniri.</p>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Kasarli Tost">
+                    
+                    <h2 class="product-name">Kaşarlı Tost</h2>
+                    <p>Ayvalık ekmeği,kaşar peyniri.</p>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm6-->
+        <section id="bolum6" class="menu-section">
+            <h2>Salatalar</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Tulum Peynirli Cevizli Salata">
+                    <img src="salataT.png" alt="İçecek 1">
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Ton Balikli Salata">
+                    <img src="salataTon.png" alt="İçecek 2">
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Sezar Salata">
+                    <img src="salataSezar.png" alt="İçecek 3">
+                    <p class="price">₺10</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bölüm7-->
+        <section id="bolum7" class="menu-section">
+            <h2>Yan Ürünler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="6'li Soğan Halkasi">
+             
+                    <h2 class="product-name">6'lı Soğan Halkası</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="6'li Nugget">
+                    
+                    <h2 class="product-name">6'li Nugget</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="6'li Mozzarella Stick">
+                   
+                    <h2 class="product-name">6'li Mozzarella Stick</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="9'lu Çitir Tavuk Toplari">
+                 
+                    <h2 class="product-name">9'lu Çitir Tavuk Toplari</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Patates Kizartmasi">
+                    
+                    <h2 class="product-name">Patates Kizartmasi</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Combo">
+                   
+                    <h2 class="product-name">Combo</h2>
+                    <p>4'lü soğan halkası + 4'lü nugget + 4'lü mozzarella stick + patates kızartması.</p>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm8-->
+        <section id="bolum8" class="menu-section">
+            <h2>Ekstra Malzemeler ve Soslar</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="50gr Et">
+                    
+                    <h2 class="product-name">50gr Et</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="100gr Et">
+                   
+                    <h2 class="product-name">100gr Et</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Dana Füme">
+                    
+                    <h2 class="product-name">Dana Füme</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Cheddar">
+                   
+                    <h2 class="product-name">Cheddar</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Ranch Sos">
+             
+                    <h2 class="product-name">Ranch Sos</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Balli Hardal">
+            
+                    <h2 class="product-name">Ballı Hardal</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Barbeku">
+              
+                    <h2 class="product-name">Barbekü</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Aci Sos">
+               
+                    <h2 class="product-name">Acı Sos</h2>
+                    <p class="price">₺5</p>
+                </div>
+                <div class="product-card" data-product-name="Garlic Sos">
+                 
+                    <h2 class="product-name">Garlic Sos</h2>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bölüm9-->
+        <section id="bolum9" class="menu-section">
+            <h2>İçecekler</h2>
+            <div class="product-grid">
+                <div class="product-card" data-product-name="Pepsi">
+                 
+                    <h2 class="product-name">Pepsi</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Pepsi Max">
+                    
+                    <h2 class="product-name">Pepsi Max</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Yedigun">
+                    
+                    <h2 class="product-name">Yedigün</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Sprite">
+                    <h2 class="product-name">Sprite</h2>
+                   <p>1L Sprite.</p>
+                   <p class="price">₺10</p>
+               </div>
+                <div class="product-card" data-product-name="Fruko">
+                    
+                    <h2 class="product-name">Fruko</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Fuse Tea">
+                 
+                    <h2 class="product-name">Fuse Tea</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Ayran">
+            
+                    <h2 class="product-name">Ayran</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Tropicana">
+                  
+                    <h2 class="product-name">Tropicana</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Nigde Gazozu">
+                   
+                    <h2 class="product-name">Niğde Gazozu</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Sade Soda">
+                    
+                    <h2 class="product-name">Sade Soda</h2>
+                    <p class="price">₺10</p>
+                </div>
+                <div class="product-card" data-product-name="Su">
+                
+                    <h2 class="product-name">Su</h2>
+                    <p>1.5L Su.</p>
+                    <p class="price">₺5</p>
+                </div>
+            </div>
+        </section>
+
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        const closeBtn = document.querySelector(".close");
+    
+        // Resme tıklandığında modal açılır
+        document.querySelectorAll(".product-card img").forEach(img => {
+            img.addEventListener("click", function () {
+                modal.style.display = "flex"; // Flex düzeniyle aç
+                modalImg.src = this.src; // Tıklanan resmin kaynağını modalda göster
+            });
+        });
+    
+        // Modal kapatma işlemi
+        closeBtn.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+    
+        window.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    </script>
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.navbar');
+            const redBar = document.querySelector('.red-bar');
+            const subNavbar = document.querySelector('.sub-navbar');
+
+            if (window.scrollY > 60) {
+                navbar.style.top = '0';  // Sabit bar üstte
+                redBar.style.top = '0';  // Kırmızı bar yukarıya çekildi
+                subNavbar.style.top = '70px';  // Alt navbar da yukarıya çekildi
+            } else {
+                navbar.style.top = '0';  // Başlangıçta sabit konum
+                redBar.style.top = '0';
+                subNavbar.style.top = '0';  // Alt navbar sabit konumda
+            }
+        });
+    </script>
+
+</body>
+</html>
